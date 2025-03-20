@@ -188,38 +188,6 @@ def search_record():
     except FileNotFoundError:
         messagebox.showerror("Error", "No data found!")
 
-# Delete functionality
-def delete_record():
-    selected_item = tree.selection()
-    if not selected_item:
-        messagebox.showwarning("Delete", "Please select a record to delete!")
-        return
-
-    confirm = messagebox.askyesno("Confirm", "Are you sure you want to delete this record?")
-    if confirm:
-        load_sheet_number = tree.item(selected_item, "values")[0]  # Get Load Sheet Number
-        try:
-            wb = load_workbook(EXCEL_FILE)
-            ws = wb.active
-
-            # Find the row to delete
-            row_to_delete = None
-            for idx, row in enumerate(ws.iter_rows(min_row=2, max_col=1, values_only=True), start=2):  # Start from row 2
-                if row[0] == load_sheet_number:
-                    row_to_delete = idx
-                    break
-
-            if row_to_delete:
-                ws.delete_rows(row_to_delete)  # Delete the row
-                wb.save(EXCEL_FILE)
-                tree.delete(selected_item)  # Remove from the table
-                messagebox.showinfo("Success", "Record deleted successfully!")
-                update_status("Record deleted successfully!")
-            else:
-                messagebox.showerror("Error", "Record not found in the Excel file!")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to delete record: {e}")
-
 # Refresh functionality
 def refresh_table():
     load_existing_records()
@@ -232,8 +200,7 @@ def show_help():
     1. Enter the vehicle number, tare weight, and gross weight.
     2. Click 'Generate Bill' to save the data and create a bill.
     3. Use the 'Search' field to find records by vehicle number or load sheet number.
-    4. Use the 'Delete' button to remove a record.
-    5. Click 'Refresh' to update the table with the latest data.
+    4. Click 'Refresh' to update the table with the latest data.
     """
     messagebox.showinfo("Help", help_text)
 
@@ -308,13 +275,9 @@ for col in columns:
 # Load existing records on startup
 load_existing_records()
 
-# Delete button
-delete_button = tk.Button(root, text="Delete Record", command=delete_record)
-delete_button.grid(row=8, column=0, padx=10, pady=10)
-
 # Refresh button
 refresh_button = tk.Button(root, text="Refresh", command=refresh_table)
-refresh_button.grid(row=8, column=1, padx=10, pady=10)
+refresh_button.grid(row=8, column=0, padx=10, pady=10)
 
 # Status bar
 status_bar = tk.Label(root, text="Ready", bd=1, relief=tk.SUNKEN, anchor=tk.W)
